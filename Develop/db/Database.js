@@ -56,7 +56,10 @@ class Database {
   }
 
   findRole() {
-    return this.connection.query(`SELECT`);
+    return this.connection.query("SELECT * FROM role", (err, result) => {
+      if (err) throw err;
+      console.table(result);
+    });
   }
 
   findEmployee() {
@@ -64,7 +67,10 @@ class Database {
   }
 
   findDepartment() {
-    return this.connection.query(`SELECT`);
+    return this.connection.query("SELECT * FROM department", (err, result) => {
+      if (err) throw err;
+      console.table(result);
+    });
   }
 }
 
