@@ -10,6 +10,7 @@ const Database = require("./db/Database");
 //      value:
 //  }
 // }
+Database.getAllEmployees();
 
 // if view employees selected, it'll call getEmployees function
 // call the findEmployees function from the Database class that we created
