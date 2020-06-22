@@ -62,16 +62,6 @@ class Database {
         this.connection.end();
       }
     );
-    // return this.connection.query(
-    //   "INSERT INTO department SET ?",
-    //   {
-    //     name: deptName,
-    //   },
-    //   (err, result) => {
-    //     if (err) throw err;
-    //     console.log(`${deptName} added to departments`);
-    //   }
-    // );
   }
   // create new employee async function
   async createEmployee() {
@@ -193,16 +183,65 @@ class Database {
   }
   // create new role
   async createRole() {
-    return this.connection.query(
-      "INSERT INTO role SET ?",
-      {
-        title: title,
-        salary: salary,
-        department_id: deptId,
-      },
-      (err, result) => {
+    // get department name and id to be referenced to by the new role
+    let departmentId;
+    let departmentNames = [];
+    let departments = [];
+    // db query to get that info
+    const departmentInfo = await this.connection.query(
+      "SELECT id, name FROM department",
+      (err, res) => {
         if (err) throw err;
-        console.log(`New role called ${title} added`);
+        res.forEach((department) => {
+          departments.push({ id: department.id, name: department.name });
+          departmentNames.push(department.name);
+        });
+      }
+    );
+
+    // prompt user for new role title, salary, and department name
+    const prompts = await inquirer.prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "What is the name of the new role?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the new role?",
+      },
+      {
+        type: "list",
+        name: "department",
+        message: "What department does this role belong to?",
+        choices: departmentNames,
+      },
+    ]);
+
+    // parse the salary to an integer
+    let salary = parseInt(prompts.salary);
+    // match department name to the department id so the id can be saved to the new role db entry
+    departments.forEach((department) => {
+      if (prompts.department === department.name) {
+        departmentId = department.id;
+      }
+    });
+
+    // once data has been sorted out, save the new role into the role db table
+    const saveRole = await this.connection.query(
+      "INSERT INTO role SET ?",
+      [
+        {
+          title: prompts.title,
+          salary: salary,
+          department_id: departmentId,
+        },
+      ],
+      (err, res) => {
+        if (err) throw err;
+        console.log(`${prompts.title} added to roles`);
+        connection.end();
       }
     );
   }

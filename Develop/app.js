@@ -2,6 +2,8 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 const Database = require("./db/Database");
 const { connection } = require("./db/Database");
+console.log("2");
+console.log(2);
 
 // create a prompt when the app is started
 const init = async () => {
@@ -38,6 +40,7 @@ const init = async () => {
     Database.createDepartments();
   } else if (intro.todo === "Add new role") {
     // call function to add new role
+    Database.createRole();
     // prompt for role title, salary, and department_id
   } else if (intro.todo === "Update employee's role") {
     // call function to update an employee's role
