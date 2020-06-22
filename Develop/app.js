@@ -10,11 +10,12 @@ const init = async () => {
 
   if (intro.todo === "See all employees") {
     // call function to retrieve all employees
-    const getAllEmployees = await Database.getAllEmployees();
+    Database.getAllEmployees();
     init();
   } else if (intro.todo === "See all departments") {
     // call function to retrieve all departments
     Database.findDepartment();
+
     init();
   } else if (intro.todo === "See all roles") {
     // call function to retrieve all roles
