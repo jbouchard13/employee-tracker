@@ -24,22 +24,18 @@ const init = async () => {
   if (intro.todo === "See all employees") {
     // call function to retrieve all employees
     Database.getAllEmployees();
-    init();
   } else if (intro.todo === "See all departments") {
     // call function to retrieve all departments
     Database.getAllDepartments();
-
-    init();
   } else if (intro.todo === "See all roles") {
     // call function to retrieve all roles
     Database.getAllRoles();
-    init();
   } else if (intro.todo === "Add new employee") {
+    // call create employee function
     Database.createEmployee();
-    init();
   } else if (intro.todo === "Add new department") {
     // call function to add new department
-    // prompt for department name
+    Database.createDepartments();
   } else if (intro.todo === "Add new role") {
     // call function to add new role
     // prompt for role title, salary, and department_id

@@ -7,22 +7,27 @@ class Database {
   }
   // get all employees
   getAllEmployees() {
-    return this.connection.query(
+    const result = this.connection.query(
       "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name FROM employee LEFT JOIN role ON (employee.role_id = role.id) LEFT JOIN department ON (role.department_id = department.id);",
       (err, result) => {
         if (err) throw err;
         console.log("");
         console.table(result);
+        this.connection.end();
       }
     );
   }
   // get all departments
   getAllDepartments() {
-    return this.connection.query("SELECT * FROM department", (err, result) => {
-      if (err) throw err;
-      console.log("");
-      console.table(result);
-    });
+    const result = this.connection.query(
+      "SELECT * FROM department",
+      (err, result) => {
+        if (err) throw err;
+        console.log("");
+        console.table(result);
+        this.connection.end();
+      }
+    );
   }
   // get all roles
   getAllRoles() {
@@ -32,21 +37,41 @@ class Database {
         if (err) throw err;
         console.log("");
         console.table(result);
+        this.connection.end();
       }
     );
   }
   // create new department
-  createDepartments(deptName) {
-    return this.connection.query(
+  async createDepartments() {
+    const prompts = await inquirer.prompt([
+      {
+        type: "input",
+        name: "deptName",
+        message: "What would you like the new department's name to be?",
+      },
+    ]);
+
+    const addDeptQuery = await this.connection.query(
       "INSERT INTO department SET ?",
       {
-        name: deptName,
+        name: prompts.deptName,
       },
       (err, result) => {
         if (err) throw err;
-        console.log(`${deptName} added to departments`);
+        console.log(`${prompts.deptName} added to departments.`);
+        this.connection.end();
       }
     );
+    // return this.connection.query(
+    //   "INSERT INTO department SET ?",
+    //   {
+    //     name: deptName,
+    //   },
+    //   (err, result) => {
+    //     if (err) throw err;
+    //     console.log(`${deptName} added to departments`);
+    //   }
+    // );
   }
   // create new employee async function
   async createEmployee() {
@@ -160,9 +185,14 @@ class Database {
         manager_id: managerId,
       }
     );
+    this.connection.end();
+    // console log the new employee's name so the user knows who they added
+    console.log(
+      `${prompts.firstName} ${prompts.lastName} added to employee database.`
+    );
   }
   // create new role
-  createRole(title, salary, deptId) {
+  async createRole() {
     return this.connection.query(
       "INSERT INTO role SET ?",
       {
