@@ -2,11 +2,24 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 const Database = require("./db/Database");
 const { connection } = require("./db/Database");
-const questions = require("./prompts/questions");
 
 // create a prompt when the app is started
 const init = async () => {
-  const intro = await inquirer.prompt(questions.introQuestions);
+  const intro = await inquirer.prompt({
+    type: "list",
+    name: "todo",
+    message: "What would you like to do?",
+    choices: [
+      "See all employees",
+      "See all departments",
+      "See all roles",
+      "Add new employee",
+      "Add new department",
+      "Add new role",
+      "Update employee's role",
+      "Exit",
+    ],
+  });
 
   if (intro.todo === "See all employees") {
     // call function to retrieve all employees
@@ -22,9 +35,7 @@ const init = async () => {
     Database.findRole();
     init();
   } else if (intro.todo === "Add new employee") {
-    // prompt for employee's first and last name
-    // prompt for their role_id and manager_id(can be null)
-    const newEmployee = await inquirer.prompt(questions.newEmployeeQuestions);
+    Database.createEmployee();
   } else if (intro.todo === "Add new department") {
     // call function to add new department
     // prompt for department name
