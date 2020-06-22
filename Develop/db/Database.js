@@ -26,11 +26,14 @@ class Database {
   }
   // get all roles
   getAllRoles() {
-    return this.connection.query("SELECT * FROM role", (err, result) => {
-      if (err) throw err;
-      console.log("");
-      console.table(result);
-    });
+    const result = this.connection.query(
+      "SELECT * FROM role",
+      (err, result) => {
+        if (err) throw err;
+        console.log("");
+        console.table(result);
+      }
+    );
   }
   // create new department
   createDepartments(deptName) {
@@ -47,36 +50,55 @@ class Database {
   }
   // create new employee async function
   async createEmployee() {
-    // create empty array for roles
+    // create empty array for roles for list prompt
     let roles = [];
-    // create empty array for managers
-    let managers = ["None"];
+    let roleTitles = [];
+    // create empty array for managers names for list prompt
+    let managersNames = ["None"];
+    let managers = [];
+    // create variable for role id
+    let roleId;
+    // create variable for manager id
+    let managerId;
 
     // get existing department and role info
     const roleQuery = await this.connection.query(
-      "SELECT role.title FROM role",
+      "SELECT id, role.title FROM role",
       (err, res) => {
         if (err) throw err;
         // push each role name to the roles array
         res.forEach((res) => {
-          roles.push(res.title);
+          roles.push({ id: res.id, title: res.title });
+        });
+        // push the titles to their own array for prompts
+        roles.forEach((role) => {
+          roleTitles.push(role.title);
         });
       }
     );
 
-    // get existing employee names
+    // get existing employee names and id
     const employeeQuery = await this.connection.query(
-      "SELECT first_name, last_name FROM employee",
+      "SELECT id, first_name, last_name FROM employee",
       (err, res) => {
         if (err) throw err;
-        res.forEach((res) => {
+        res.forEach((employee) => {
           // join the first and last names together from responses
-          let name = `${res.first_name} ${res.last_name}`;
+          let name = `${employee.first_name} ${employee.last_name}`;
           // push names to managers array
-          managers.push(name);
+          managersNames.push(name);
+        });
+        // add all info to the managers array to get ids
+        res.forEach((employee) => {
+          managers.push({
+            id: employee.id,
+            first_name: employee.first_name,
+            last_name: employee.last_name,
+          });
         });
       }
     );
+
     // prompt user with info provided from queries
     const prompts = await inquirer.prompt([
       {
@@ -93,16 +115,33 @@ class Database {
         type: "list",
         name: "role",
         message: "What is their role?",
-        choices: roles,
+        choices: roleTitles,
       },
       {
         type: "list",
         name: "manager",
         message: "Who is their manager?",
-        choices: managers,
+        choices: managersNames,
       },
     ]);
-    console.log(prompts);
+
+    // get answers from prompts to get role_id and manager_id for db add
+    roles.forEach((role) => {
+      if (prompts.role === role.title) {
+        roleId = role.id;
+      }
+    });
+    console.log(roleId);
+    // add employee to the db with the provided info from prompts
+    // const addEmployee = await this.connection.query(
+    //   "INSERT INTO employee SET ?",
+    //   {
+    //     first_name: prompts.firstName,
+    //     last_name: prompts.lastName,
+    //     role_id: roleId,
+    //     manager_id: prompts.manager,
+    //   }
+    // );
   }
   // create new role
   createRole(title, salary, deptId) {

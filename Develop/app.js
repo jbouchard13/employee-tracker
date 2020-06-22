@@ -27,12 +27,12 @@ const init = async () => {
     init();
   } else if (intro.todo === "See all departments") {
     // call function to retrieve all departments
-    Database.findDepartment();
+    Database.getAllDepartments();
 
     init();
   } else if (intro.todo === "See all roles") {
     // call function to retrieve all roles
-    Database.findRole();
+    Database.getAllRoles();
     init();
   } else if (intro.todo === "Add new employee") {
     Database.createEmployee();
