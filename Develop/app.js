@@ -36,6 +36,7 @@ const init = async () => {
     init();
   } else if (intro.todo === "Add new employee") {
     Database.createEmployee();
+    init();
   } else if (intro.todo === "Add new department") {
     // call function to add new department
     // prompt for department name

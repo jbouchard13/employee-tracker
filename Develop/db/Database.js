@@ -128,20 +128,38 @@ class Database {
     // get answers from prompts to get role_id and manager_id for db add
     roles.forEach((role) => {
       if (prompts.role === role.title) {
+        // set the roleId to the selected role's id
         roleId = role.id;
       }
     });
-    console.log(roleId);
+
+    // split the selected manager's full name into first and last name so it will work with the query
+    const nameSplit = prompts.manager.split(" ");
+
+    managers.forEach((employee) => {
+      if (
+        // check if the name's match
+        nameSplit[0] === employee.first_name ||
+        nameSplit[1] === employee.last_name
+      ) {
+        // set managerId to the selected manager's employee id
+        managerId = employee.id;
+      } else {
+        // if none selected, set the managerId to null
+        managerId = null;
+      }
+    });
+
     // add employee to the db with the provided info from prompts
-    // const addEmployee = await this.connection.query(
-    //   "INSERT INTO employee SET ?",
-    //   {
-    //     first_name: prompts.firstName,
-    //     last_name: prompts.lastName,
-    //     role_id: roleId,
-    //     manager_id: prompts.manager,
-    //   }
-    // );
+    const addEmployee = await this.connection.query(
+      "INSERT INTO employee SET ?",
+      {
+        first_name: prompts.firstName,
+        last_name: prompts.lastName,
+        role_id: roleId,
+        manager_id: managerId,
+      }
+    );
   }
   // create new role
   createRole(title, salary, deptId) {
